@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>maps_news Platform: Interactive Development Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals with a Cool Blue Accent -->
+    <!-- Application Structure Plan: The SPA is structured into four logical, tab-navigated sections: Overview, Project Setup, Sprints, and Documentation. This thematic structure was chosen over a linear representation of the report because it allows different user personas (developers, managers) to directly access the information most relevant to them. The core interaction is the 'Sprints' section, which uses sub-navigation to break down the development timeline into manageable phases. This progressive disclosure of information prevents cognitive overload and makes the complex plan easy to digest and navigate. -->
+    <!-- Visualization & Content Choices:
+    - Report Info: Directory Structure -> Goal: Organize -> Presentation: HTML list styled with Tailwind to create a visual tree -> Interaction: None, static visual representation -> Justification: Clearly visualizes the project's file structure without needing graphics libraries, adhering to the NO SVG constraint.
+    - Report Info: Sprint Breakdown -> Goal: Organize/Compare -> Presentation: Interactive tabs for each sprint -> Interaction: User clicks to dynamically display content for one sprint at a time -> Justification: This is the most effective way to present a phased plan, allowing users to focus on a single sprint's goals and stories without the distraction of other sections.
+    - Report Info: Tech Stack & Principles -> Goal: Inform -> Presentation: Styled cards using HTML/CSS -> Interaction: None, static info -> Justification: Cards visually group related items, making the core technologies and principles scannable and easy to understand.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .nav-link.active {
+            color: #2563eb; /* blue-600 */
+            border-bottom-color: #2563eb;
+        }
+        .tab-button {
+            transition: all 0.2s;
+        }
+        .tab-button.active {
+            background-color: #2563eb; /* blue-600 */
+            color: #ffffff;
+        }
+        .tree-view ul {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .tree-view li {
+            position: relative;
+        }
+        .tree-view li::before, .tree-view li::after {
+            content: '';
+            position: absolute;
+            left: -1rem;
+        }
+        .tree-view li::before {
+            border-top: 1px solid #d6d3d1; /* stone-300 */
+            width: 0.75rem;
+            top: 0.875rem;
+        }
+        .tree-view li::after {
+            border-left: 1px solid #d6d3d1; /* stone-300 */
+            height: 100%;
+            top: 0;
+        }
+        .tree-view li:last-child::after {
+            height: 0.875rem;
+        }
+        .tree-view > li::after, .tree-view > li::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <div id="app" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-900">maps_news Platform</h1>
+            <p class="mt-2 text-lg text-stone-600">Interactive Development & Deployment Plan</p>
+        </header>
+
+        <nav class="sticky top-0 bg-stone-100/80 backdrop-blur-md z-10 mb-8 border-b border-stone-200">
+            <ul class="flex justify-center space-x-4 sm:space-x-8 text-sm sm:text-base font-medium text-stone-500">
+                <li><a href="#overview" data-section="overview" class="nav-link active py-4 inline-block border-b-2 border-transparent">Overview</a></li>
+                <li><a href="#setup" data-section="setup" class="nav-link py-4 inline-block border-b-2 border-transparent">Project Setup</a></li>
+                <li><a href="#sprints" data-section="sprints" class="nav-link py-4 inline-block border-b-2 border-transparent">Sprints</a></li>
+                <li><a href="#docs" data-section="docs" class="nav-link py-4 inline-block border-b-2 border-transparent">Documentation</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="overview" class="app-section">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-stone-800">Project Overview</h2>
+                    <p class="mt-2 max-w-3xl mx-auto text-stone-600">This section provides a high-level summary of the project's guiding principles and the technology stack that will be used to build the maps_news Platform. It sets the context for the detailed development plan outlined in the subsequent sections.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-stone-700 mb-4">Core Principles & Methodology</h3>
+                        <ul id="core-principles" class="space-y-3 text-stone-600"></ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-stone-700 mb-4">Technology Stack</h3>
+                        <ul id="tech-stack" class="space-y-3 text-stone-600"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="setup" class="app-section hidden">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-stone-800">Project Setup & Initialization</h2>
+                    <p class="mt-2 max-w-3xl mx-auto text-stone-600">Here you will find the foundational steps required to set up the development environment. This includes the project's directory structure, version control setup, dependency management, and the continuous integration pipeline configuration.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div id="project-setup-tasks" class="md:col-span-2 grid md:grid-cols-2 gap-8"></div>
+                </div>
+            </section>
+
+            <section id="sprints" class="app-section hidden">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-stone-800">Development Sprints</h2>
+                    <p class="mt-2 max-w-3xl mx-auto text-stone-600">This is the core of the development plan, broken down into four distinct sprints. Each sprint has a clear goal and a set of user stories to be implemented following a Test-Driven Development (TDD) workflow. Select a sprint below to explore its objectives and tasks.</p>
+                </div>
+                <div id="sprint-tabs" class="flex justify-center flex-wrap gap-2 mb-8"></div>
+                <div id="sprint-content" class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 min-h-[300px]"></div>
+            </section>
+
+            <section id="docs" class="app-section hidden">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl font-bold text-stone-800">Documentation</h2>
+                    <p class="mt-2 max-w-3xl mx-auto text-stone-600">This section contains comprehensive guides for installing, configuring, running, and testing the application. These instructions are essential for developers to get the system operational and to maintain its quality standards.</p>
+                </div>
+                <div id="doc-tabs" class="flex justify-center flex-wrap gap-2 mb-8"></div>
+                <div id="doc-content" class="bg-white p-6 rounded-lg shadow-sm border border-stone-200"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const appData = {
+            overview: {
+                principles: [
+                    { icon: '逃', name: 'Package Management', description: '`uv` for all Python dependency and virtual environment management.' },
+                    { icon: '諺', name: 'Version Control', description: '`git` with a feature-branching workflow.' },
+                    { icon: 'ｧｪ', name: 'Testing Framework', description: '`pytest` for all unit, integration, and end-to-end tests.' },
+                    { icon: '糖', name: 'Structured Logging', description: '`structlog` for machine-readable JSON logs.' },
+                    { icon: '売', name: 'Development Methodology', description: 'Strict Test-Driven Development (TDD).' },
+                ],
+                techStack: [
+                    { name: 'Backend', value: 'FastAPI' },
+                    { name: 'Database', value: 'PostgreSQL (Production), SQLite (Dev)' },
+                    { name: 'ORM', value: 'SQLAlchemy' },
+                    { name: 'NLP', value: 'spaCy (English & Spanish)' },
+                    { name: 'ML/Clustering', value: 'scikit-learn' },
+                    { name: 'Task Queue', value: 'Celery & Redis' },
+                    { name: 'OCR', value: 'Tesseract' },
+                ]
+            },
+            setup: [
+                {
+                    title: 'Project Scaffolding',
+                    content: `
+                        <p class="text-stone-600 mb-4">The initial directory structure for the project.</p>
+                        <div class="bg-stone-800 text-white p-4 rounded-md text-sm font-mono tree-view">
+                            <ul>
+                                <li>maps_news_platform/
+                                    <ul>
+                                        <li>maps_news/
+                                            <ul><li>api/</li><li>core/</li><li>crud/</li><li>models/</li><li>schemas/</li><li>pipeline/</li><li>cli.py</li></ul>
+                                        </li>
+                                        <li>tests/
+                                            <ul><li>unit/</li><li>integration/</li><li>e2e/</li></ul>
+                                        </li>
+                                        <li>scripts/</li>
+                                        <li>config/
+                                            <ul><li>default.yml</li><li>production.yml</li></ul>
+                                        </li>
+                                        <li>.gitignore</li>
+                                        <li>pyproject.toml</li>
+                                        <li>README.md</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    `
+                },
+                {
+                    title: 'Version Control Setup',
+                    content: `
+                        <p class="text-stone-600 mb-4">Initialize the git repository and make the first commit.</p>
+                        <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">git init<br>git add .<br>git commit -m "Initial project structure"</code>
+                    `
+                },
+                {
+                    title: 'Environment & Dependencies',
+                    content: `
+                        <p class="text-stone-600 mb-4">Create the virtual environment and install dependencies using uv.</p>
+                        <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">uv venv<br>source .venv/bin/activate<br>uv pip install -e .[dev]</code>
+                    `
+                },
+                {
+                    title: 'CI/CD Pipeline Setup',
+                    content: `
+                        <p class="text-stone-600 mb-4">Configure a basic CI pipeline (e.g., GitHub Actions) to run on every push, ensuring code quality and test coverage.</p>
+                        <ul class="list-disc list-inside text-stone-600 space-y-1">
+                            <li>Install dependencies with <strong>uv</strong></li>
+                            <li>Run test suite with <strong>pytest</strong></li>
+                            <li>Generate code coverage report</li>
+                            <li>Fail build if tests fail or coverage drops below 80%</li>
+                        </ul>
+                    `
+                }
+            ],
+            sprints: [
+                {
+                    id: 1,
+                    name: 'Sprint 1: Core & Admin',
+                    goal: 'Build a solid, testable foundation for the application, focusing on infrastructure and administration tools.',
+                    stories: [
+                        { title: 'Story 20: Database Init', steps: ['**Test:** Check if CLI command creates tables.', '**Code:** Implement SQLAlchemy models and a `db-init` CLI command.', '**Refactor:** Ensure robust database session management.'] },
+                        { title: 'NFR: Configuration', steps: ['**Test:** Verify correct parsing of YAML config files.', '**Code:** Create a config loading module in `core/config.py`.', '**Refactor:** Allow sensitive data to be loaded from environment variables.'] },
+                        { title: 'NFR: Structured Logging', steps: ['**Test:** Confirm logging produces structured JSON output.', '**Code:** Configure `structlog` in `core/logging.py`.', '**Refactor:** Make log levels configurable via YAML.'] },
+                        { title: 'Stories 21 & 22: User Management CLI', steps: ['**Test:** Write tests for `add-user` and `toggle-user-status` CLI commands.', '**Code:** Implement user CRUD functions and expose via CLI.', '**Refactor:** Centralize database operations in the CRUD module.'] }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: 'Sprint 2: Data Pipeline',
+                    goal: 'Implement the data ingestion, parsing, and storage pipeline.',
+                    stories: [
+                        { title: 'Stories 1 & 3: Extraction & Transformation', steps: ['**Test:** Write integration tests for each file parser.', '**Code:** Create `pipeline/parsers.py` with functions for each file type.', '**Refactor:** Use a factory/strategy pattern to select the correct parser.'] },
+                        { title: 'Story 1a: OCR', steps: ['**Test:** Write integration test for the OCR module.', '**Code:** Implement an OCR function in `pipeline/ocr.py` using `pytesseract`.', '**Refactor:** Encapsulate OCR logic into a clean, reusable service.'] },
+                        { title: 'Stories 2, 4, 5: Scheduling, Loading, Auditing', steps: ['**Test:** Write unit tests for the main Celery pipeline task.', '**Code:** Create a Celery task to orchestrate ingestion, transformation, and loading.', '**Refactor:** Decouple orchestration from parsing logic and ensure fault-tolerance.'] }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: 'Sprint 3: Content App',
+                    goal: 'Develop the user-facing FastAPI application for content interaction.',
+                    stories: [
+                         { title: 'Story 6 & NFR: Security', steps: ['**Test:** Test login endpoint, inactive users, and protected endpoints.', '**Code:** Implement OAuth2PasswordBearer flow with JWTs.', '**Refactor:** Centralize all authentication logic in an `auth` module.'] },
+                        { title: 'Stories 7, 8, 9: Search, Filter, View', steps: ['**Test:** Write tests for the search API endpoint with FTS and filtering.', '**Code:** Create FastAPI endpoints and CRUD functions for article retrieval.', '**Refactor:** Optimize database queries and indexing.'] },
+                        { title: 'Stories 10, 11, 12: Annotate & Export', steps: ['**Test:** Write tests for adding annotations and exporting data as CSV/JSON.', '**Code:** Implement the API endpoints and CRUD functions for these features.', '**Refactor:** Ensure all logic properly respects user permissions.'] }
+                    ]
+                },
+                {
+                    id: 4,
+                    name: 'Sprint 4: Data Analysis',
+                    goal: 'Implement the asynchronous NLP processing jobs for automated data analysis.',
+                    stories: [
+                        { title: 'Stories 13 & 14: Job Scheduling & Scope', steps: ['**Test:** Verify the task correctly queries for articles based on `last_nlp_run_timestamp`.', '**Code:** Create a scheduled Celery task to fetch appropriate articles.', '**Refactor:** Make the look-back window configurable.'] },
+                        { title: 'Story 17: NER', steps: ['**Test:** Assert that the spaCy integration correctly identifies entities in English/Spanish text.', '**Code:** Implement NLP function to load models, extract entities, and store results.', '**Refactor:** Isolate spaCy model loading to avoid reloading on every call.'] },
+                        { title: 'Story 16: Word Cloud', steps: ['**Test:** Verify the Celery task processes text and returns word cloud data.', '**Code:** Create an on-demand Celery task triggered by an API call.', '**Refactor:** Ensure text preprocessing logic is reusable.'] },
+                        { title: 'Stories 18 & 19: Clustering & Association Rules', steps: ['**Test:** Write tests for scikit-learn clustering and association rule modules.', '**Code:** Integrate these modules into the scheduled NLP Celery task.', '**Refactor:** Encapsulate ML logic cleanly.'] }
+                    ]
+                }
+            ],
+            docs: [
+                {
+                    id: 'install',
+                    name: 'Installation',
+                    content: `
+                        <h4 class="font-semibold text-lg mb-2 text-stone-700">Prerequisites</h4>
+                        <ul class="list-disc list-inside space-y-1 mb-6 text-stone-600">
+                            <li>Python 3.10+</li>
+                            <li><code>uv</code> package manager (<code>pip install uv</code>)</li>
+                            <li><code>git</code> version control</li>
+                            <li>PostgreSQL Server (for production)</li>
+                            <li>Tesseract OCR Engine</li>
+                        </ul>
+                        <h4 class="font-semibold text-lg mb-2 text-stone-700">Steps</h4>
+                        <div class="space-y-4">
+                            <p>1. Clone the repository:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">git clone &lt;repository_url&gt;<br>cd maps_news_platform</code>
+                            <p>2. Create the virtual environment:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">uv venv<br>source .venv/bin/activate</code>
+                            <p>3. Install dependencies:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">uv pip install -e .[dev]</code>
+                            <p>4. Install spaCy models:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">python -m spacy download en_core_web_sm<br>python -m spacy download es_core_news_sm</code>
+                        </div>
+                    `
+                },
+                {
+                    id: 'config',
+                    name: 'Configuration',
+                    content: `
+                        <p class="mb-4 text-stone-600">Application behavior is controlled by YAML files in the <code>config/</code> directory. Settings in <code>production.yml</code> will override those in <code>default.yml</code>. Set the <code>APP_CONFIG_FILE</code> environment variable to specify a config file.</p>
+                         <h4 class="font-semibold text-lg mb-2 text-stone-700">Example <code>production.yml</code></h4>
+                         <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">database:<br>&nbsp;&nbsp;url: "postgresql://user:password@host:port/dbname"<br><br>logging:<br>&nbsp;&nbsp;level: "INFO"<br><br>celery:<br>&nbsp;&nbsp;broker_url: "redis://localhost:6379/0"<br>&nbsp;&nbsp;result_backend: "redis://localhost:6379/1"</code>
+                    `
+                },
+                {
+                    id: 'running',
+                    name: 'Running',
+                    content: `
+                        <div class="space-y-4">
+                            <p>1. Initialize the Database (run once):</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">maps_news db-init</code>
+                            <p>2. Add an Admin User:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">maps_news add-user --username &lt;admin&gt; --password &lt;pass&gt; --role admin</code>
+                            <p>3. Start Backend Services (in separate terminals):</p>
+                            <ul class="list-disc list-inside space-y-2 text-stone-600">
+                                <li>**FastAPI Server:** <code>uvicorn maps_news.main:app --reload</code></li>
+                                <li>**Redis Server:** (Start the service if not running)</li>
+                                <li>**Celery Worker:** <code>celery -A maps_news.celery_worker.celery worker --loglevel=info</code></li>
+                                <li>**Celery Beat (Scheduler):** <code>celery -A maps_news.celery_worker.celery beat --loglevel=info</code></li>
+                            </ul>
+                        </div>
+                    `
+                },
+                {
+                    id: 'testing',
+                    name: 'Testing',
+                    content: `
+                        <div class="space-y-4">
+                            <p>1. Run the entire test suite:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">pytest</code>
+                            <p>2. Run tests with a coverage report:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">pytest --cov=maps_news --cov-report=html</code>
+                            <p>3. Run a specific test file:</p>
+                            <code class="block bg-stone-800 text-white p-4 rounded-md text-sm font-mono">pytest tests/unit/test_parsers.py</code>
+                        </div>
+                    `
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.app-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const sprintTabsContainer = document.getElementById('sprint-tabs');
+            const sprintContentContainer = document.getElementById('sprint-content');
+
+            const docTabsContainer = document.getElementById('doc-tabs');
+            const docContentContainer = document.getElementById('doc-content');
+
+            function showSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.toggle('hidden', section.id !== sectionId);
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === sectionId);
+                });
+            }
+
+            function renderOverview() {
+                const principlesList = document.getElementById('core-principles');
+                principlesList.innerHTML = appData.overview.principles.map(p => `
+                    <li class="flex items-start">
+                        <span class="text-xl mr-3">${p.icon}</span>
+                        <div>
+                            <span class="font-semibold text-stone-700">${p.name}:</span> ${p.description}
+                        </div>
+                    </li>
+                `).join('');
+
+                const techStackList = document.getElementById('tech-stack');
+                techStackList.innerHTML = appData.overview.techStack.map(t => `
+                    <li class="flex items-center">
+                         <span class="font-semibold text-stone-700 w-32">${t.name}</span>
+                         <span>${t.value}</span>
+                    </li>
+                `).join('');
+            }
+
+            function renderSetup() {
+                const setupContainer = document.getElementById('project-setup-tasks');
+                setupContainer.innerHTML = appData.setup.map(task => `
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+                        <h3 class="text-xl font-semibold text-stone-700 mb-4">${task.title}</h3>
+                        ${task.content}
+                    </div>
+                `).join('');
+            }
+
+            function renderSprint(sprintId) {
+                const sprint = appData.sprints.find(s => s.id === sprintId);
+                if (!sprint) return;
+
+                sprintContentContainer.innerHTML = `
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">${sprint.name}</h3>
+                    <p class="text-stone-600 italic mb-6">${sprint.goal}</p>
+                    <div class="space-y-6">
+                        ${sprint.stories.map(story => `
+                            <div class="border-t border-stone-200 pt-4">
+                                <h4 class="font-semibold text-stone-800">${story.title}</h4>
+                                <ul class="mt-2 space-y-1 text-sm text-stone-600 pl-5 list-disc">
+                                    ${story.steps.map(step => `<li>${step}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                sprintTabsContainer.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.sprintId) === sprintId);
+                });
+            }
+
+            function renderDoc(docId) {
+                const doc = appData.docs.find(d => d.id === docId);
+                if (!doc) return;
+                docContentContainer.innerHTML = doc.content;
+                docTabsContainer.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.docId === docId);
+                });
+            }
+
+            function initSprints() {
+                sprintTabsContainer.innerHTML = appData.sprints.map(sprint => `
+                    <button data-sprint-id="${sprint.id}" class="tab-button text-sm font-medium px-4 py-2 rounded-md bg-white text-stone-600 border border-stone-200 hover:bg-stone-50">${sprint.name}</button>
+                `).join('');
+
+                sprintTabsContainer.addEventListener('click', e => {
+                    if (e.target.matches('.tab-button')) {
+                        renderSprint(parseInt(e.target.dataset.sprintId));
+                    }
+                });
+
+                renderSprint(1);
+            }
+
+            function initDocs() {
+                docTabsContainer.innerHTML = appData.docs.map(doc => `
+                    <button data-doc-id="${doc.id}" class="tab-button text-sm font-medium px-4 py-2 rounded-md bg-white text-stone-600 border border-stone-200 hover:bg-stone-50">${doc.name}</button>
+                `).join('');
+
+                docTabsContainer.addEventListener('click', e => {
+                    if (e.target.matches('.tab-button')) {
+                        renderDoc(e.target.dataset.docId);
+                    }
+                });
+                renderDoc('install');
+            }
+
+
+            document.querySelector('nav').addEventListener('click', (e) => {
+                if (e.target.matches('.nav-link')) {
+                    e.preventDefault();
+                    const sectionId = e.target.dataset.section;
+                    showSection(sectionId);
+                    window.history.pushState(null, '', `#${sectionId}`);
+                }
+            });
+
+            function handleInitialSection() {
+                const hash = window.location.hash.substring(1);
+                const validSections = ['overview', 'setup', 'sprints', 'docs'];
+                if (validSections.includes(hash)) {
+                    showSection(hash);
+                } else {
+                    showSection('overview');
+                }
+            }
+
+            renderOverview();
+            renderSetup();
+            initSprints();
+            initDocs();
+            handleInitialSection();
+        });
+    </script>
+</body>
+</html>
