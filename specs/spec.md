@@ -257,7 +257,7 @@ app:
   secret_key: "${ENV:APP_SECRET_KEY}"
 
 database:
-  url: "postgresql://user:${DB_PASS}@db:5432/web_pipeline"
+  url: "postgresql://user:${DB_PASS}@db:5432/news_pipeline"
 
 redis:
   url: "redis://redis:6379/0"

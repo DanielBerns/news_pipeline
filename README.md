@@ -1,4 +1,4 @@
-# **Content Analysis and NLP platform: a web pipeline**.
+# **Content Analysis and NLP platform: a data pipeline for news**.
 
 # Content Analysis Platform (Project Perla)
 
@@ -40,8 +40,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/DanielBerns/web_pipeline.git](https://github.com/DanielBerns/web_pipeline.git)
-cd web_pipeline
+git clone [https://github.com/DanielBerns/news_pipeline.git](https://github.com/DanielBerns/news_pipeline.git)
+cd news_pipeline
 ```
 
 ### 2. Use makefile

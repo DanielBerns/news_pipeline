@@ -1,5 +1,5 @@
 [project]
-name = "web-pipeline"
+name = "news-pipeline"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -35,7 +35,7 @@ dev = [
 ]
 
 [project.scripts]
-web-pipeline = "web_pipeline:main"
+web-pipeline = "news_pipeline:main"
 
 [build-system]
 requires = ["hatchling"]
