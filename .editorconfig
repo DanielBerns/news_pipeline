@@ -1,0 +1,24 @@
+# This is the top-most .editorconfig file
+root = true
+
+# Universal rules for all files
+[*]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_style = space
+
+# Python files (PEP 8 standard)
+[*.py]
+indent_size = 4
+
+# Web files (React, HTML, CSS, JS) and Config files (YAML, JSON, Markdown)
+# These commonly use 2-space indentation
+[*.{js,jsx,html,css,scss,yml,yaml,json,md}]
+indent_size = 2
+
+# Makefile rules
+[Makefile]
+indent_style = tab
+indent_size = 4

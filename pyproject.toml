@@ -7,7 +7,26 @@ authors = [
     { name = "DanielBerns", email = "daniel.w.berns@gmail.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "alembic>=1.17.0",
+    "celery>=5.5.3",
+    "fastapi>=0.119.1",
+    "httpx>=0.28.1",
+    "pandas>=2.3.3",
+    "pydantic>=2.12.3",
+    "pymupdf>=1.26.5",
+    "pytesseract>=0.3.13",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "python-docx>=1.2.0",
+    "python-dotenv>=1.1.1",
+    "redis>=7.0.0",
+    "scikit-learn>=1.7.2",
+    "selenium>=4.37.0",
+    "spacy>=3.8.7",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.38.0",
+]
 
 [project.scripts]
 web-pipeline = "web_pipeline:main"
