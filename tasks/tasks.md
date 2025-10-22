@@ -11,7 +11,7 @@
 
 **Increment 0.2 — Basic CI skeleton**
 * **Tasks:**
-    * Add GitHub Actions workflow `ci/test.yml` which:
+    * Add GitHub Actions workflow `.github/workflows/test.yml` which:
         * installs python, sets up dependencies
         * runs pytest (unit)
         * runs linters (flake8 / black check)

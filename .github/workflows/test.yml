@@ -1,0 +1,52 @@
+name: Basic CI Skeleton (uv & pyproject.toml)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      # 1. Check out code
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Set up Python and uv (with caching)
+      # This single step does three things:
+      # - Installs the correct Python version
+      # - Installs the latest version of `uv`
+      # - Sets up caching for `uv` automatically
+      - name: Set up Python ${{ matrix.python-version }} with uv
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          uv: latest
+          cache: 'uv'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: |
+          # Installs main dependencies AND all "dev" extras
+          uv pip install .[dev]
+
+      # 4. Run Linters
+      - name: Run Linters
+        run: |
+          echo "Running Flake8..."
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+          echo "Running Black (check)..."
+          black . --check
+
+      # 5. Run Pytest
+      - name: Run Pytest
+        run: |
+          pytest
