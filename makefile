@@ -67,7 +67,7 @@ test-all: test-unit test-integration
 
 run:
 	@echo "--- 🚀 Starting FastAPI server (live reload) ---"
-	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	uv run uvicorn news_pipeline.main:app --reload --host 0.0.0.0 --port 8000
 
 # --- Database Migrations (Alembic) ---
 

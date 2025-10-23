@@ -37,6 +37,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # --- Dependency for FastAPI ---
 
+
 def get_db() -> Session:
     """
     Dependency function for FastAPI routes to get a database session.
@@ -47,6 +48,7 @@ def get_db() -> Session:
         yield db
     finally:
         db.close()
+
 
 # --- Optional: Function to Create Tables (for initial setup without Alembic, or testing) ---
 # It's generally better to use Alembic migrations ('make db-upgrade') for schema management.
