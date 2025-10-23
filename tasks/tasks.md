@@ -2,32 +2,43 @@
 
 ## PHASE 0 — Repo & dev environment (foundation)
 
-**Increment 0.1 — Basic repo structure and tooling**
+### **Increment 0.1 — Basic repo structure and tooling**
+
 * **Tasks:**
     * Add / update `pyproject.toml` (or `requirements.txt`) with pinned dev dependencies: fastapi, uvicorn, sqlalchemy, alembic, pytest, pytest-asyncio, httpx, pydantic, python-dotenv, psycopg2-binary (or asyncpg if used), celery, redis, spaCy, scikit-learn, pytesseract, pymupdf, python-docx, pandas, playwright.
     * Add `.editorconfig`, `.github/ISSUE_TEMPLATE` and `PR_TEMPLATE`, `.gitignore`.
     * Add `Makefile` / task runner (invoke) with common tasks: `install-dev`, `format`, `lint`, `test`, `run`.
     * Add `README/CONTRIBUTING` with setup steps.
 
-**Increment 0.2 — Basic CI skeleton**
+### **Increment 0.2 — Basic CI skeleton**
+
 * **Tasks:**
-    * Add GitHub Actions workflow `.github/workflows/test.yml` which:
-        * installs python, sets up dependencies
-        * runs pytest (unit)
+    * TODO: Implement old school CI with bash scripts and make
         * runs linters (flake8 / black check)
-        * optionally caches pip
-    * Add small matrix for python versions (3.10, 3.11).
+        * runs ruff
+        * runs pytest (unit)
+
 
 ## PHASE 1 — Core backend, data models, and migrations
 
-**Increment 1.1 — SQLAlchemy models + Alembic**
+### **Increment 1.1 — SQLAlchemy models + Alembic**
+
 * **Tasks:**
     * Add an `app/` package with modules: `models.py`, `database.py`, `schemas.py`, `crud.py`, `main.py` (minimal FastAPI app).
     * Implement models in `models.py` using SQLAlchemy ORM matching the spec (User, Source, Article, Annotation, NamedEntity, ArticleEntity, Cluster, ArticleCluster, JobRun). Use UUID PKs.
-    * Add `alembic/` with `env.py` configured to use `app.models` metadata.
-    * Add initial migration creating the tables.
+    * At the command line, run make db-start for initializing alembic.
+      This creates an alembic directory and an alembic.ini file. Configure alembic.ini.
+    * Open the alembic.ini file and locate the [alembic] section. Find the sqlalchemy.url option and set it to point to your desired SQLite database file.
+    * For a local SQLite file named database.db in your project's root directory, the configuration would be:
+    sqlalchemy.url = sqlite:///database.db
+    * If you prefer an in-memory SQLite database for even quicker testing (where the database is wiped clean with each run), you can use: sqlalchemy.url = sqlite:///:memory:
 
-**Increment 1.2 — Minimal API endpoints and authentication stub**
+    * Add `alembic/` with `env.py` configured to use `news_pipeline.models` metadata.
+    * make db-upgrade
+    * make db-migrate
+
+### **Increment 1.2 — Minimal API endpoints and authentication stub**
+
 * **Tasks:**
     * Add FastAPI app with endpoints:
         * `POST /api/users` (create user) — for now accept plaintext password, hashed on save using argon2/bcrypt.

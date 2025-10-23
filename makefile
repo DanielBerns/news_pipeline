@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # --- Configuration ---
 # venv directory is managed by uv (defaults to .venv)
 VENV_DIR := .venv
-SRC_DIR := app
+SRC_DIR := src/news_pipeline
 TESTS_DIR := tests
 
 # Phony targets are ones that don't represent actual files.
@@ -70,6 +70,10 @@ run:
 	uv run uvicorn news_pipeline.main:app --reload --host 0.0.0.0 --port 8000
 
 # --- Database Migrations (Alembic) ---
+
+db-start:
+	@echo "--- 🗄️ Initializing alembic ---"
+	uv run alembic init alembic
 
 db-upgrade:
 	@echo "--- 🗄️ Applying database migrations ---"

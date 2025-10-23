@@ -43,8 +43,14 @@ class SourceTypeEnum(enum.Enum):
     WEBSITE = "website"
     RSS = "rss"
     LOCAL = "local"
-    S3 = "s3"  # Added based on latest spec.md (v4.2), though not in foxtrot
+    CLOUD = "cloud"
 
+class JobStatusTypeEnum(enum.Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    SUCCESS = "success"
+    FAILED  = "failed"
+    PARTIAL = "partial"
 
 # --- Models ---
 
@@ -64,9 +70,9 @@ class User(Base):
 
     annotations = relationship("Annotation", back_populates="user")
 
-    __table_args__ = (
-        CheckConstraint(role.in_(["admin", "data_analyst"]), name="user_role_check"),
-    )
+    # __table_args__ = (
+    #     CheckConstraint(role.in_(["admin", "data_analyst"]), name="user_role_check"),
+    # )
 
 
 class Source(Base):
@@ -76,7 +82,7 @@ class Source(Base):
 
     source_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    type = Column(Enum(SourceTypeEnum), nullable=False)  # Stricter version
+    kind = Column(Enum(SourceTypeEnum), nullable=False)  # Stricter version
     location = Column(String, nullable=False)  # URL or path
     config = Column(JSONB)  # For parser hints, credentials, row_mapping etc.
     last_run_timestamp = Column(DateTime(timezone=True), nullable=True)
@@ -86,11 +92,11 @@ class Source(Base):
 
     articles = relationship("Article", back_populates="source")
 
-    __table_args__ = (
-        CheckConstraint(
-            type.in_(["website", "rss", "local", "s3"]), name="source_type_check"
-        ),
-    )
+    # __table_args__ = (
+    #     CheckConstraint(
+    #         kind.in_(["website", "rss", "local", "s3"]), name="source_type_check"
+    #     ),
+    # )
 
 
 class Article(Base):
@@ -121,7 +127,7 @@ class Article(Base):
     content_text_vector = Column(TSVECTOR, nullable=True)  # For PostgreSQL FTS
     last_nlp_run_timestamp = Column(DateTime(timezone=True), nullable=True, index=True)
     extracted_via_ocr = Column(Boolean, default=False)  # Added based on spec v4.2
-    metadata = Column(JSONB, nullable=True)  # For row_index or other metadata
+    characteristics = Column(JSONB, nullable=True)  # For row_index or other characteristics
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -155,16 +161,16 @@ class Annotation(Base):
         nullable=True,
         index=True,
     )
-    type = Column(Enum(AnnotationTypeEnum), nullable=False)  # Stricter
+    kind = Column(Enum(AnnotationTypeEnum), nullable=False)  # Stricter
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     article = relationship("Article", back_populates="annotations")
     user = relationship("User", back_populates="annotations")
 
-    __table_args__ = (
-        CheckConstraint(type.in_(["TAG", "COMMENT"]), name="annotation_type_check"),
-    )
+    # __table_args__ = (
+    #     CheckConstraint(kind.in_(["TAG", "COMMENT"]), name="annotation_type_check"),
+    # )
 
 
 class NamedEntity(Base):
@@ -175,7 +181,7 @@ class NamedEntity(Base):
     entity_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     entity_text = Column(Text, nullable=False)  # e.g., "Google"
     normalized_form = Column(Text, nullable=False, index=True)  # e.g., "google"
-    entity_type = Column(String, nullable=False, index=True)  # e.g., 'ORG', 'PERSON'
+    category = Column(String, nullable=False, index=True)  # e.g., 'ORG', 'PERSON'
     language = Column(String(2), nullable=True, index=True)  # e.g., 'en', 'es'
     external_link = Column(Text, nullable=True)  # Optional link to KB like Wikipedia
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -187,7 +193,7 @@ class NamedEntity(Base):
 
     __table_args__ = (
         Index(
-            "ix_named_entities_uq", normalized_form, entity_type, language, unique=True
+            "ix_named_entities_uq", normalized_form, category, language, unique=True
         ),
     )
 
@@ -219,14 +225,14 @@ class Cluster(Base):
 
     cluster_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     cluster_name = Column(String, nullable=True)  # e.g., "Topic 1: Finance"
-    cluster_type = Column(Enum(ClusterTypeEnum), nullable=False)  # Stricter
+    cluster_kind = Column(Enum(ClusterTypeEnum), nullable=False)  # Stricter
     # Optional: Link to the specific job run that created/updated this cluster
     last_run_id = Column(
         UUID(as_uuid=True),
         ForeignKey("job_runs.job_run_id", ondelete="SET NULL"),
         nullable=True,
     )
-    metadata = Column(JSONB, nullable=True)  # e.g., top terms, cluster quality score
+    characteristics = Column(JSONB, nullable=True)  # e.g., top terms, cluster quality score
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -234,11 +240,11 @@ class Cluster(Base):
         "Article", secondary="article_clusters", back_populates="clusters"
     )
 
-    __table_args__ = (
-        CheckConstraint(
-            cluster_type.in_(["TOPIC", "ENTITY"]), name="cluster_type_check"
-        ),
-    )
+    # __table_args__ = (
+    #     CheckConstraint(
+    #         cluster_kind.in_(["TOPIC", "ENTITY"]), name="cluster_type_check"
+    #     ),
+    # )
 
 
 class ArticleCluster(Base):
@@ -271,9 +277,7 @@ class JobRun(Base):
     )  # e.g., 'ner_run', 'ingest_source_xyz'
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     finished_at = Column(DateTime(timezone=True), nullable=True)
-    status = Column(
-        String, nullable=False
-    )  # e.g., 'PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'PARTIAL'
+    status = Column(Enum(JobStatusTypeEnum), nullable=False)  # Stricter version
     processed_count = Column(Integer, default=0)
     error_count = Column(Integer, default=0)
     details = Column(
