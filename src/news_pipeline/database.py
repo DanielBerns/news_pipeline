@@ -8,26 +8,15 @@ load_dotenv()
 
 # --- Database Configuration ---
 
-# Get database URL from environment variable
-# Example for PostgreSQL: "postgresql://user:password@host:port/database"
-# Example for SQLite (dev): "sqlite:///./local_dev.db"
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./local_dev.db")
-
-# For SQLite, connect_args is needed to allow multithreading if using FastAPI's async routes
-connect_args = {}
-if DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+# Read from environment, with a fallback for safety (though not recommended for prod)
+DEFAULT_DB_URL = "postgresql+psycopg2://news_user:mysecretpassword@localhost:5432/news_pipeline"
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DB_URL)
 
 # --- SQLAlchemy Engine Setup ---
 
 # Create the SQLAlchemy engine
 # pool_pre_ping=True helps handle connections that may have timed out
-engine = create_engine(
-    DATABASE_URL,
-    connect_args=connect_args,
-    pool_pre_ping=True,
-    # echo=True # Uncomment for debugging SQL statements
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # --- SQLAlchemy Session Setup ---
 
@@ -36,7 +25,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # --- Dependency for FastAPI ---
-
 
 def get_db() -> Session:
     """

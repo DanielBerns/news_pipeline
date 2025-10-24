@@ -15,7 +15,7 @@ class UserBase(BaseModel):
 
 class SourceBase(BaseModel):
     name: str
-    type: str = Field(..., pattern="^(website|rss|local|s3)$")  # Enforce type values
+    kind: str = Field(..., pattern="^(website|rss|local|cloud)$")  # Enforce type values
     location: str  # Could be URL or path
     config: Optional[Dict[str, Any]] = None
     is_active: bool = True
@@ -26,7 +26,7 @@ class ArticleBase(BaseModel):
     content_text: Optional[str] = None
     original_url: Optional[HttpUrl | str] = None  # Allow general strings too initially
     source_format: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    attributes: Optional[Dict[str, Any]] = None
     # language: Optional[str] = Field(None, max_length=2) # e.g., 'en', 'es'
     # extracted_via_ocr: Optional[bool] = False
 
@@ -90,7 +90,7 @@ class Article(ArticleBase):
 
 
 class AnnotationBase(BaseModel):
-    type: str = Field(..., pattern="^(TAG|COMMENT)$")
+    kind: str = Field(..., pattern="^(TAG|COMMENT)$")
     content: str
 
 
@@ -112,7 +112,7 @@ class Annotation(AnnotationBase):
 class NamedEntityBase(BaseModel):
     entity_text: str
     normalized_form: str
-    entity_type: str
+    category: str
     language: Optional[str] = Field(None, max_length=2)
 
 

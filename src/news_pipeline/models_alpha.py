@@ -111,23 +111,10 @@ class Article(Base):
         nullable=True,
         index=True,
     )
-    title = Column(Text, nullable=True)
-    content_text = Column(Text, nullable=True)
-    original_url = Column(Text, nullable=True)
-    source_format = Column(
-        String, nullable=True
-    )  # e.g., 'pdf', 'rss', 'csv-row', 'png'
-    extraction_date = Column(DateTime(timezone=True), server_default=func.now())
-    language = Column(
-        String(2), nullable=True
-    )  # e.g., 'en', 'es' - Added based on spec v4.2 but not explicitly in plan 1.1 model
-    checksum = Column(
-        String, unique=True, index=True, nullable=True
-    )  # Useful for deduplication - Added based on spec v4.2
+    # ... other columns ...
     content_text_vector = Column(TSVECTOR, nullable=True)  # For PostgreSQL FTS
     last_nlp_run_timestamp = Column(DateTime(timezone=True), nullable=True, index=True)
-    extracted_via_ocr = Column(Boolean, default=False)  # Added based on spec v4.2
-    attributes = Column(JSONB, nullable=True)  # For row_index or other attributes
+    # ... other columns ...
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -142,6 +129,7 @@ class Article(Base):
         "Cluster", secondary="article_clusters", back_populates="articles"
     )
 
+    # --- ADD THE INDEX HERE ---
     __table_args__ = (
         Index(
             "ix_articles_content_text_vector",
@@ -295,3 +283,4 @@ class JobRun(Base):
     __table_args__ = (
         Index("ix_job_runs_job_name_started_at", job_name, started_at),
     )
+

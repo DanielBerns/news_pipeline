@@ -1,8 +1,8 @@
-"""First migration
+"""first migration
 
-Revision ID: b4db05ce1bfb
+Revision ID: 5ddc39439f78
 Revises: 
-Create Date: 2025-10-23 17:47:01.824299
+Create Date: 2025-10-24 19:58:06.733221
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'b4db05ce1bfb'
+revision: str = '5ddc39439f78'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,15 +24,14 @@ def upgrade() -> None:
     op.create_table('job_runs',
     sa.Column('job_run_id', sa.UUID(), nullable=False),
     sa.Column('job_name', sa.String(), nullable=False),
-    sa.Column('started_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('started_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('finished_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('status', sa.Enum('PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'PARTIAL', name='jobstatustypeenum'), nullable=False),
     sa.Column('processed_count', sa.Integer(), nullable=True),
     sa.Column('error_count', sa.Integer(), nullable=True),
-    sa.Column('details', postgresql.JSONB(astext_type=Text()), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('details', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-    sa.CheckConstraint("status IN ('PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'PARTIAL')", name='job_run_status_check'),
     sa.PrimaryKeyConstraint('job_run_id')
     )
     op.create_index(op.f('ix_job_runs_job_name'), 'job_runs', ['job_name'], unique=False)
@@ -44,7 +43,7 @@ def upgrade() -> None:
     sa.Column('category', sa.String(), nullable=False),
     sa.Column('language', sa.String(length=2), nullable=True),
     sa.Column('external_link', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('entity_id')
     )
@@ -57,10 +56,10 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('kind', sa.Enum('WEBSITE', 'RSS', 'LOCAL', 'CLOUD', name='sourcetypeenum'), nullable=False),
     sa.Column('location', sa.String(), nullable=False),
-    sa.Column('config', postgresql.JSONB(astext_type=Text()), nullable=True),
+    sa.Column('config', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('last_run_timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('source_id')
     )
@@ -70,7 +69,7 @@ def upgrade() -> None:
     sa.Column('hashed_password', sa.String(), nullable=False),
     sa.Column('role', sa.Enum('admin', 'data_analyst', name='roleenum'), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('user_id')
     )
@@ -82,14 +81,14 @@ def upgrade() -> None:
     sa.Column('content_text', sa.Text(), nullable=True),
     sa.Column('original_url', sa.Text(), nullable=True),
     sa.Column('source_format', sa.String(), nullable=True),
-    sa.Column('extraction_date', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('extraction_date', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('language', sa.String(length=2), nullable=True),
     sa.Column('checksum', sa.String(), nullable=True),
     sa.Column('content_text_vector', postgresql.TSVECTOR(), nullable=True),
     sa.Column('last_nlp_run_timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('extracted_via_ocr', sa.Boolean(), nullable=True),
-    sa.Column('characteristics', postgresql.JSONB(astext_type=Text()), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('attributes', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['source_id'], ['sources.source_id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('article_id')
@@ -103,8 +102,8 @@ def upgrade() -> None:
     sa.Column('cluster_name', sa.String(), nullable=True),
     sa.Column('cluster_kind', sa.Enum('TOPIC', 'ENTITY', name='clustertypeenum'), nullable=False),
     sa.Column('last_run_id', sa.UUID(), nullable=True),
-    sa.Column('characteristics', postgresql.JSONB(astext_type=Text()), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('attributes', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['last_run_id'], ['job_runs.job_run_id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('cluster_id')
@@ -115,7 +114,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.UUID(), nullable=True),
     sa.Column('kind', sa.Enum('TAG', 'COMMENT', name='annotationtypeenum'), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['article_id'], ['articles.article_id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('annotation_id')
