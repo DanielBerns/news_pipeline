@@ -69,15 +69,14 @@ def get_sources(
     statement = statement.offset(skip).limit(limit)
     return list(db.execute(statement).scalars().all())
 
-
-def create_source(db: Session, source: schemas.SourceCreate) -> models.Source:
+def create_source(db: Session, a_source: schemas.SourceCreate) -> models.Source:
     """Creates a new source."""
     db_source = models.Source(
-        name=source.name,
-        type=source.type,
-        location=source.location,
-        config=source.config,
-        is_active=source.is_active,
+        name=a_source.name,
+        kind=models.SourceTypeEnum[a_source.kind.upper()],
+        location=a_source.location,
+        config=a_source.config,
+        is_active=a_source.is_active,
     )
     db.add(db_source)
     db.commit()
@@ -98,6 +97,17 @@ def get_articles(db: Session, skip: int = 0, limit: int = 100) -> List[models.Ar
     statement = select(models.Article).offset(skip).limit(limit)
     return list(db.execute(statement).scalars().all())
 
+# ... (keep all existing functions: get_user, get_user_by_email, etc.) ...
+
+# ADD THIS NEW FUNCTION
+def get_article_by_source_url(db: Session, source_url: str):
+    """
+    Finds an article by its unique source_url.
+    """
+    return db.query(models.Article).filter(models.Article.source_url == source_url).first()
+
+
+# ... (keep all other existing functions) ...
 
 def create_article(db: Session, article: schemas.ArticleCreate) -> models.Article:
     """Creates a new article. Primarily used by the ingestion pipeline."""
@@ -107,7 +117,7 @@ def create_article(db: Session, article: schemas.ArticleCreate) -> models.Articl
         content_text=article.content_text,
         original_url=str(article.original_url) if article.original_url else None,
         source_format=article.source_format,
-        metadata=article.metadata,
+        attributes=article.attributes,
         # extraction_date is server_default
         # content_text_vector requires DB trigger or specific update logic
         # last_nlp_run_timestamp starts as NULL
@@ -223,6 +233,7 @@ def update_job_run_status(
         db.commit()
         db.refresh(db_job_run)
     return db_job_run
+
 
 
 # Add CRUD for Cluster / ArticleCluster as needed later

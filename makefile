@@ -1,95 +1,130 @@
-# Use bash as the default shell
+# --- Environment / Shell ---
+.DEFAULT_GOAL := help
 SHELL := /bin/bash
+.PHONY: help install setup ci lint test typecheck format run db-start db-upgrade db-migrate db-revision docker-db-up docker-db-down docker-db-rm docker-db-logs
 
-# --- Configuration ---
-# venv directory is managed by uv (defaults to .venv)
-VENV_DIR := .venv
-SRC_DIR := src/news_pipeline
-TESTS_DIR := tests
+# --- Docker DB Configuration ---
+# Customize these variables for your local setup
+DB_CONTAINER_NAME := news_pipeline_db
+DB_PASSWORD := mysecretpassword
+DB_USER := news_user
+DB_NAME := news_pipeline
+DB_PORT := 5432
+DB_VOLUME := pgdata
 
-# Phony targets are ones that don't represent actual files.
-.PHONY: all install-dev dev-services format lint lint-check test test-unit test-integration run db-upgrade db-migrate clean
+# Database URL for Alembic (reads from .env file or uses default)
+# Note: We export this so it's available to alembic
+export DATABASE_URL ?= postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}
 
-# --- Main Targets ---
+# --- Commands ---
+help:
+	@echo "Available commands:"
+	@echo "  install          Install dependencies using uv"
+	@echo "  setup            Alias for install"
+	@echo "  ci               Run all checks (lint, typecheck, test)"
+	@echo "  lint             Run ruff linter"
+	@echo "  typecheck        Run mypy type checker"
+	@echo "  format           Run ruff formatter"
+	@echo "  test             Run pytest"
+	@echo "  run              Run the FastAPI server with uvicorn"
+	@echo ""
+	@echo "Database (Docker):"
+	@echo "  docker-db-up     Start the local PostgreSQL Docker container"
+	@echo "  docker-db-down   Stop the local PostgreSQL Docker container"
+	@echo "  docker-db-rm     Remove the local PostgreSQL Docker container and volume"
+	@echo "  docker-db-logs   Follow the logs of the Docker container"
+	@echo ""
+	@echo "Database (Alembic):"
+	@echo "  db-start         Initialize alembic directory (with editable env.py)"
+	@echo "  db-migrate       Create a new database migration file"
+	@echo "  db-upgrade       Run database migrations (depends on docker-db-up)"
+	@echo "  db-revision      Create a new empty database migration file"
 
-all: install-dev lint test-unit
-# Default target when just typing 'make'.
+# --- Environment Setup ---
+install:
+	@echo "Syncing dependencies with uv..."
+	# Assuming you have pyproject.toml set up for uv
+	uv sync pyproject.toml --all-extras
 
-install-dev: $(VENV_DIR)/touchfile
-# This target creates the venv and syncs dependencies.
-# It's idempotent: it only runs if the venv doesn't exist or pyproject.toml changed.
+setup: install
 
-$(VENV_DIR)/touchfile: pyproject.toml .python-version
-	@echo "--- 📦 Creating/updating virtual environment at $(VENV_DIR) ---"
-	@echo "Using Python version from .python-version file..."
-	@echo "--- 🔄 Syncing all dependencies (prod + dev) ---"
-	# Syncs all main dependencies and all optional-dependencies (extras)
-	uv sync --all-extras
-	@touch $(VENV_DIR)/touchfile
-	@echo "--- ✅ Sync complete ---"
+# --- CI/Checks ---
+ci: lint typecheck test
 
-dev-services:
-	@echo "--- 🐳 Starting background services (Postgres, Redis) ---"
-	docker-compose -f docker-compose.dev.yml up --build -d
+lint:
+	@echo "Running linter..."
+	uv run -- ruff check .
 
-# --- Code Quality & Formatting ---
+typecheck:
+	@echo "Running type checker..."
+	uv run -- mypy src
 
 format:
-	@echo "--- 🎨 Formatting code with black ---"
-	uv run black $(SRC_DIR) $(TESTS_DIR)
+	@echo "Running formatter..."
+	uv run -- ruff format .
 
-lint-check:
-	@echo "--- 🧐 Checking formatting with black ---"
-	uv run black --check $(SRC_DIR) $(TESTS_DIR)
-	@echo "---  linting with flake8 ---"
-	uv run flake8 $(SRC_DIR) $(TESTS_DIR)
+test:
+	@echo "Running tests..."
+	uv run -- pytest
 
-lint: format lint-check
-# 'lint' will auto-format first, then run the checks.
-
-# --- Testing ---
-
-test: test-unit
-# Default 'make test' runs only the fast unit tests
-
-test-unit:
-	@echo "--- 🧪 Running unit tests ---"
-	uv run pytest $(TESTS_DIR)/unit -q
-
-test-integration:
-	@echo "--- 🧪 Running integration tests (requires services) ---"
-	uv run pytest $(TESTS_DIR)/integration -q
-
-test-all: test-unit test-integration
-	@echo "--- ✅ All tests passed ---"
-
-# --- Running the App ---
-
+# --- Application ---
 run:
-	@echo "--- 🚀 Starting FastAPI server (live reload) ---"
-	uv run uvicorn news_pipeline.main:app --reload --host 0.0.0.0 --port 8000
+	@echo "Starting server..."
+	uv run -- uvicorn src.news_pipeline.main:app --reload
+
+# --- Docker Database Management ---
+docker-db-up:
+	@echo "Starting local PostgreSQL container..."
+	@if [ $$(docker ps -q -f name=^/${DB_CONTAINER_NAME}$$) ]; then \
+		echo "Container '${DB_CONTAINER_NAME}' is already running."; \
+	elif [ $$(docker ps -aq -f name=^/${DB_CONTAINER_NAME}$$) ]; then \
+		echo "Starting existing container '${DB_CONTAINER_NAME}'..."; \
+		docker start ${DB_CONTAINER_NAME}; \
+	else \
+		echo "Creating and starting new container '${DB_CONTAINER_NAME}'..."; \
+		docker run -d \
+			--name ${DB_CONTAINER_NAME} \
+			-e POSTGRES_USER=${DB_USER} \
+			-e POSTGRES_PASSWORD=${DB_PASSWORD} \
+			-e POSTGRES_DB=${DB_NAME} \
+			-v ${DB_VOLUME}:/var/lib/postgresql/data \
+			-p ${DB_PORT}:5432 \
+			postgres:16; \
+		echo "Waiting for database to be ready..."; \
+		sleep 5; \
+	fi
+
+docker-db-down:
+	@echo "Stopping local PostgreSQL container..."
+	@docker stop ${DB_CONTAINER_NAME}
+
+docker-db-rm:
+	@echo "Stopping and removing local PostgreSQL container..."
+	@docker rm -f ${DB_CONTAINER_NAME}
+	@echo "Removing data volume '${DB_VOLUME}'..."
+	@docker volume rm ${DB_VOLUME} || true
+
+docker-db-logs:
+	@echo "Following database logs (Press Ctrl+C to stop)..."
+	@docker logs -f ${DB_CONTAINER_NAME}
 
 # --- Database Migrations (Alembic) ---
 
 db-start:
-	@echo "--- 🗄️ Initializing alembic ---"
+	@echo "Initializing alembic..."
 	uv run alembic init alembic
 
-db-upgrade:
-	@echo "--- 🗄️ Applying database migrations ---"
-	uv run alembic upgrade head
+# Note: db-upgrade now depends on docker-db-up
+db-upgrade: docker-db-up
+	@echo "Running database migrations..."
+	@echo "Using database URL: ${DATABASE_URL}"
+	uv run -- alembic upgrade head
 
 db-migrate:
-	@echo "--- 🗄️ Generating new migration file ---"
-	@read -p "Enter migration message: " msg; \
-	uv run alembic revision --autogenerate -m "$$msg"
+	@echo "Creating new migration..."
+	@uv run -- bash -c 'read -p "Enter migration message: " msg; alembic revision --autogenerate -m "$$msg"'
 
-# --- Cleanup ---
+db-revision:
+	@echo "Creating new empty revision..."
+	@uv run -- bash -c 'read -p "Enter migration message: " msg; alembic revision -m "$$msg"'
 
-clean:
-	@echo "--- 🧹 Cleaning up ---"
-	rm -rf $(VENV_DIR)
-	rm -rf .pytest_cache
-	rm -rf .coverage
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name ".ruff_cache" -exec rm -rf {} +

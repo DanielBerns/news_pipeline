@@ -90,7 +90,7 @@ def create_source(source: schemas.SourceCreate, db: Session = Depends(get_db)):
     - **is_active**: Defaults to True.
     """
     # Potential future validation: check if source location already exists?
-    return crud.create_source(db=db, source=source)
+    return crud.create_source(db, source)
 
 
 @app.get("/api/sources/", response_model=List[schemas.Source], tags=["Sources"])
@@ -103,7 +103,7 @@ def read_sources(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
 
 
 @app.get("/api/sources/{source_id}", response_model=schemas.Source, tags=["Sources"])
-def read_source(source_id: uuid.UUID, db: Session = Depends(get_db)):
+def read_source_by_uuid(source_id: uuid.UUID, db: Session = Depends(get_db)):
     """
     Retrieves a specific source by its UUID.
     """
@@ -130,7 +130,7 @@ def create_article(article: schemas.ArticleCreate, db: Session = Depends(get_db)
     - **content_text**: Main text content.
     - **original_url**: URL where the article originated.
     - **source_format**: Format of the original source (e.g., 'pdf', 'html').
-    - **metadata**: Optional JSON object for extra info (like CSV row index).
+    - **attributes**: Optional JSON object for extra info (like CSV row index).
     """
     # Potential future validation: Check checksum if implemented to prevent duplicates?
     return crud.create_article(db=db, article=article)

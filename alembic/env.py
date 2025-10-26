@@ -14,14 +14,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
 from news_pipeline.models import Base # Adjust this import to your project structure
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+from news_pipeline.models import Base # Adjust this import to your project structure
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
