@@ -90,7 +90,7 @@ def create_source(source: schemas.SourceCreate, db: Session = Depends(get_db)):
     - **is_active**: Defaults to True.
     """
     # Potential future validation: check if source location already exists?
-    return crud.create_source(db=db, source=source)
+    return crud.create_source(db, source)
 
 
 @app.get("/api/sources/", response_model=List[schemas.Source], tags=["Sources"])

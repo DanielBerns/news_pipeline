@@ -69,15 +69,14 @@ def get_sources(
     statement = statement.offset(skip).limit(limit)
     return list(db.execute(statement).scalars().all())
 
-
-def create_source(db: Session, source: schemas.SourceCreate) -> models.Source:
+def create_source(db: Session, a_source: schemas.SourceCreate) -> models.Source:
     """Creates a new source."""
     db_source = models.Source(
-        name=source.name,
-        kind=source.kind,
-        location=source.location,
-        config=source.config,
-        is_active=source.is_active,
+        name=a_source.name,
+        kind=models.SourceTypeEnum[a_source.kind.upper()],
+        location=a_source.location,
+        config=a_source.config,
+        is_active=a_source.is_active,
     )
     db.add(db_source)
     db.commit()
