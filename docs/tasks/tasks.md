@@ -59,7 +59,7 @@
 **Increment 2.2 — Row mapping configuration & metadata**
 * **Tasks:**
     * Add `Source.config` JSON structure for row-mapping (e.g., `{"row_mode": true, "columns": ["title","body"]}`).
-    * Ensure ingest pipeline honors config and writes `row_index` to `Article.metadata`.
+    * Ensure ingest pipeline honors config and writes `row_index` to `Article.attributes`.
 
 ## PHASE 3 — NLP: language detection and spaCy NER
 

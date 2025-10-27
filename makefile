@@ -1,7 +1,7 @@
 # --- Environment / Shell ---
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
-.PHONY: help install setup ci lint test typecheck format run db-start db-upgrade db-migrate db-revision docker-db-up docker-db-down docker-db-rm docker-db-logs
+.PHONY: help install setup ci lint test typecheck format run db-start db-upgrade db-migrate db-revision docker-db-up docker-db-down docker-db-rm docker-db-logs clean
 
 # --- Docker DB Configuration ---
 # Customize these variables for your local setup
@@ -39,6 +39,9 @@ help:
 	@echo "  db-migrate       Create a new database migration file"
 	@echo "  db-upgrade       Run database migrations (depends on docker-db-up)"
 	@echo "  db-revision      Create a new empty database migration file"
+	@echo ""
+	@echo "Cleaning repo:"
+	@echo "  clean    - Remove Python cache files and build artifacts"
 
 # --- Environment Setup ---
 install:
@@ -128,3 +131,26 @@ db-revision:
 	@echo "Creating new empty revision..."
 	@uv run -- bash -c 'read -p "Enter migration message: " msg; alembic revision -m "$$msg"'
 
+clean:
+	@echo "Cleaning Python cache files and build artifacts..."
+	# Find and remove all .pyc files
+	find . -type f -name "*.pyc" -delete
+
+	# Find and remove all __pycache__ directories
+	# Using -exec rm -rf instead of -delete for non-empty directories
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+
+	# Find and remove pytest cache
+	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+
+	# Find and remove tox directories
+	find . -type d -name ".tox" -exec rm -rf {} +
+
+	# Find and remove .egg-info directories
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+
+	# Remove build and dist directories
+	rm -rf build/
+	rm -rf dist/
+
+	@echo "Cleaning complete."
